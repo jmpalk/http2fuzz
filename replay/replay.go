@@ -2,16 +2,27 @@
 // Licensed under the BSD license, see LICENSE file for terms.
 // Written by Stuart Larsen
 // http2fuzz - HTTP/2 Fuzzer
+// Modified by Justin Palk
 package replay
 
-import "github.com/c0nrad/http2fuzz/util"
+import ( 
+	"os"
+	"bufio"
+	"golang.org/x/net/http2"
+	"github.com/jmpalk/http2fuzz/util"
+	"github.com/jmpalk/http2fuzz/config"
+)
 
-import "os"
+
 
 var ReplayWriteFile *os.File
+var ReplayReadFile *os.File
 
 func init() {
-	ReplayWriteFile = OpenWriteFile("replay.json")
+	if config.ReplayMode == false {
+		ReplayWriteFile = OpenWriteFile("replay.json")
+	}
+	ReplayReadFile = OpenReadFile("replay.json")
 }
 
 type ReplayHandler struct {
@@ -26,9 +37,27 @@ func OpenWriteFile(filename string) *os.File {
 	return f
 }
 
+func OpenReadFile(filename string) *os.File{
+	f, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
+
 func TruncateFile() {
 	ReplayWriteFile.Truncate(0)
 	ReplayWriteFile.Seek(0, 0)
+}
+
+func ReadFromReplayFile() ([]string){
+	var data []string
+	scanner := bufio.NewScanner(ReplayReadFile)
+
+	for scanner.Scan() {
+		data = append(data, scanner.Text())
+	}
+	return data
 }
 
 func WriteToReplayFile(data []byte) {
@@ -53,25 +82,78 @@ func SaveRawFrame(frameType, flags uint8, streamID uint32, payload []byte) {
 	WriteToReplayFile(out)
 }
 
-// func RunReplay(c *fuzzer.Connection, frames []string) {
-// 	for _, frameJSON := range frames {
-// 		frame := util.FromJSON([]byte(frameJSON))
+func SaveWindowUpdateFrame(streamID, incr uint32){
+	frame := map[string]interface{}{
+		"FrameMethod": "WindowUpdateFrame",
+		"StreamID":	streamID,
+		"Incr":		incr,
+		}
+	out := util.ToJSON(frame)
+	WriteToReplayFile(out)
+}
 
-// 		if c.Err != nil {
-// 			fmt.Println("Connection Error", c.Err, "restarting connection")
-// 			c = fuzzer.NewConnection(Target, c.IsTLS, c.IsPreface, c.IsSendSettings)
-// 		}
+func SaveResetFrame(streamID, errorCode uint32){
+	frame := map[string]interface{}{
+		"FrameMethod": "ResetFrame",
+		"StreamID":	streamID,
+		"ErrorCode":	errorCode,
+		}
+	out := util.ToJSON(frame)
+	WriteToReplayFile(out)
+}
 
-// 		switch frame["FrameMethod"] {
-// 		case "RawFrame":
-// 			fmt.Println(frame)
-// 			frameType := uint8(frame["FrameType"].(float64))
-// 			flags := uint8(frame["Flags"].(float64))
-// 			streamID := uint32(frame["StreamID"].(float64))
-// 			payload := util.FromBase64(frame["Payload"].(string))
-// 			c.WriteRawFrame(frameType, flags, streamID, payload)
-// 			time.Sleep(time.Second * 1)
-// 		}
-// 	}
-// 	fmt.Println("ALL DONE")
-// }
+func SavePriorityFrame(streamID, streamDep uint32, weight uint8, exclusive bool){
+	frame := map[string]interface{}{
+		"FrameMethod": 	"PriorityFrame",
+		"StreamID":	streamID,
+		"StreamDep":	streamDep,
+		"Weight":	weight,
+		"Exclusive":	exclusive,
+		}
+	out := util.ToJSON(frame)
+	WriteToReplayFile(out)
+}
+
+func SaveWriteContinuationFrame(streamID uint32, endStream bool, data []byte){
+	frame := map[string]interface{}{
+		"FrameMethod":	"WriteContinuationFrame",
+		"StreamID":	streamID,
+		"EndStream":	endStream,
+		"Data":		data,
+		}
+	out := util.ToJSON(frame)
+	WriteToReplayFile(out)
+}
+
+func SavePushPromiseFrame(streamID, promiseID uint32, blockFragment []byte, endHeaders bool, padLength uint8){
+	frame := map[string]interface{}{
+		"FrameMethod":		"PushPromiseFrame",
+		"StreamID":		streamID,
+		"PromiseID":		promiseID,
+		"BlockFragment":	blockFragment,
+		"EndHeaders":		endHeaders,
+		"PadLength":		padLength,
+		}
+	out := util.ToJSON(frame)
+	WriteToReplayFile(out)
+}
+
+func SaveDataFrame(streamID uint32, endStream bool, data []byte){
+	frame := map[string]interface{}{
+		"FrameMethod":		"DataFrame",
+		"StreamID":		streamID,
+		"EndStream":		endStream,
+		"Data":			data,
+		}
+	out := util.ToJSON(frame)
+	WriteToReplayFile(out)
+}
+
+func SaveSettingsFrame(settings []http2.Setting){
+	frame := map[string]interface{}{
+		"FrameMethod":	"SettingsFrame",
+		"Settings":	settings,
+		}
+	out := util.ToJSON(frame)
+	WriteToReplayFile(out)
+}

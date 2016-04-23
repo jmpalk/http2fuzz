@@ -1,4 +1,4 @@
-# http2fuzz (No longer under development)
+# http2fuzz 
 
 HTTP2 fuzzer built in Golang.
 
@@ -124,45 +124,23 @@ fuzzer/connection.go conatins the Connection struct. This structure sits on top 
 fuzzer/fuzzer.go contains all the fuzzing strategies.
 
 ## Replay Mode
+Running in replay mode:
+./http2fuzz -target "TTT.XXX.YYY.ZZZ:443" -replay
 
-The code recently got refactored and it hasen't been refactoed back in, and it only works with raw frames fuzzer, for testing with single frames, a script like this works:
+Will replay the HTTP2 requests logged in replay.json at a rate of 1 per second.
 
-```
-package main
+This function currently only works when http2fuzz is running as the client. Extending this functionality to server mode is the main goal for the next release.
 
-import (
-    "io"
-    "net"
 
-    "github.com/bradfitz/http2"
-    "github.com/c0nrad/http2fuzz/util"
-)
-
-func main() {
-    var Target = "localhost:80"
-
-    conn := Dial(Target)
-    io.WriteString(conn, http2.ClientPreface)
-
-    framer := http2.NewFramer(conn, conn)
-
-    // FrameType, Flag, StreamId, Payload
-    framer.WriteRawFrame(http2.FrameType(10), http2.Flags(16), 481004859, util.FromBase64("dZfden+U2nU/Y5uUsM3iz2XwAboFueI/xyR2"))
-}
-
-func Dial(host string) net.Conn {
-    conn, err := net.Dial("tcp", host)
-    if err != nil {
-        panic(err)
-    }
-    return conn
-}
-```
+**WARNING**
+If you run http2fuzz _not_ in replay mode it will overwrite your replay.json file. I will fix this in the next update.
 
 ## Contact
 
 stuartlarsen@yahoo-inc.com
+current version: jmpalk@gmail.com
 
 ## Copyright
 
 Copyright 2015 Yahoo Inc. Licensed under the BSD license, see LICENSE file for terms. Written by Stuart Larsen
+Modified by Justin Palk
