@@ -1,3 +1,8 @@
+// Copyright 2015 Yahoo Inc.
+// Licensed under the BSD license, see LICENSE file for terms.
+// Written by Stuart Larsen
+// http2fuzz - HTTP/2 Fuzzer
+// Modified by Justin Palk
 package util
 
 import (
@@ -13,7 +18,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bradfitz/http2"
+	"golang.org/x/net/http2"
 )
 
 func FromBase64(in string) []byte {

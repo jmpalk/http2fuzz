@@ -2,6 +2,7 @@
 // Licensed under the BSD license, see LICENSE file for terms.
 // Written by Stuart Larsen
 // http2fuzz - HTTP/2 Fuzzer
+// Modified by Justin Palk
 package fuzzer
 
 import (
@@ -10,8 +11,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/c0nrad/http2fuzz/config"
-	"github.com/c0nrad/http2fuzz/replay"
+	"github.com/jmpalk/http2fuzz/config"
+	"github.com/jmpalk/http2fuzz/replay"
 )
 
 func FuzzConnection(conn net.Conn) {

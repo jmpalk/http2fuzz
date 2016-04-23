@@ -2,6 +2,7 @@
 // Licensed under the BSD license, see LICENSE file for terms.
 // Written by Stuart Larsen
 // http2fuzz - HTTP/2 Fuzzer
+// Modified by Justin Palk
 package fuzzer
 
 import (
@@ -12,10 +13,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/c0nrad/http2fuzz/config"
-	"github.com/c0nrad/http2fuzz/util"
+	"github.com/jmpalk/http2fuzz/config"
+	"github.com/jmpalk/http2fuzz/util"
 
-	"github.com/bradfitz/http2"
+	"golang.org/x/net/http2"
 )
 
 type Fuzzer struct {
