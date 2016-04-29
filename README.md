@@ -1,6 +1,8 @@
 # http2fuzz 
 
 HTTP2 fuzzer built in Golang.
+forked from https://github.com/c0nrad/http2fuzz and modified
+	by Justin Palk at https://github.com/jmpalk/http2fuzz
 
 ![Fuzzer](/docs/http2fuzz.gif)
 
