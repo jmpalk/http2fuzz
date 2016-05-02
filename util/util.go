@@ -2,7 +2,9 @@
 // Licensed under the BSD license, see LICENSE file for terms.
 // Written by Stuart Larsen
 // http2fuzz - HTTP/2 Fuzzer
-// Modified by Justin Palk
+//
+// forked from https://github.com/c0nrad/http2fuzz and 
+// 	modified by Justin Palk
 package util
 
 import (
