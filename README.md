@@ -16,6 +16,8 @@ forked from https://github.com/c0nrad/http2fuzz and modified
          -port="8000": port to listen from
          -restart-delay=10: number a milliseconds to wait between broken connections
          -target="": HTTP2 server to fuzz in host:port format
+	 -infile="":file to read replay requests from (default replay.json)
+	 -outfile="":file to save replay requests to (default replay.json, will not overwrite an existing file)
     $ ./http2fuzz --target "localhost:443"
 
 ## Description
@@ -134,12 +136,8 @@ Will replay the HTTP2 requests logged in replay.json at a rate of 1 per second.
 This function currently only works when http2fuzz is running as the client. Extending this functionality to server mode is the main goal for the next release.
 
 
-**WARNING**
-If you run http2fuzz _not_ in replay mode it will overwrite your replay.json file. I will fix this in the next update.
-
 ## Contact
 
-stuartlarsen@yahoo-inc.com
 current version: jmpalk@gmail.com
 
 ## Copyright

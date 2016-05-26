@@ -17,16 +17,18 @@ const (
 	ModeServer = "server"
 )
 
-const (
-	ReplayWriteFilename = "./replay.json"
-	ReplayReadFilename  = "./replay.json"
-)
+//const (
+//	ReplayWriteFilename = "./replay.json"
+//	ReplayReadFilename  = "./replay.json"
+//)
 
 var RestartDelay time.Duration
 var FuzzDelay time.Duration
 var Target string
 var FuzzMode string
 var ReplayMode bool
+var ReplayReadFilename string
+var ReplayWriteFilename string
 
 var Port string
 var Interface string
@@ -44,9 +46,12 @@ func init() {
 
 	flag.StringVar(&Port, "port", "8000", "port to listen from")
 	flag.StringVar(&Interface, "listen", "0.0.0.0", "interface to listen from")
+	flag.StringVar(&ReplayWriteFilename, "outfile", "./replay.json", "JSON file to write to")
+	flag.StringVar(&ReplayReadFilename, "infile", "./replay.json", "JSON File to read input from")
+
 
 	//line below was originally commented out
-	flag.BoolVar(&ReplayMode, "replay", false, "replay frames from replay.json")
+	flag.BoolVar(&ReplayMode, "replay", false, "replay frames from <<infile>> (default replay.json)")
 	flag.Parse()
 
 	RestartDelay = time.Duration(restartMillisecond) * time.Millisecond
